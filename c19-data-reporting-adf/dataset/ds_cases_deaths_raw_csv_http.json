@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "covid19/nationalcasedeaths/csv"
+				"relativeUrl": "cases_deaths.csv"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
