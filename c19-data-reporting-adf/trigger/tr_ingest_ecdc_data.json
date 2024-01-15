@@ -3,18 +3,7 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [
-			{
-				"pipelineReference": {
-					"referenceName": "pl_ingests_ecdc_data",
-					"type": "PipelineReference"
-				},
-				"parameters": {
-					"sourceRelativeUrl": "hospital_admissions.csv",
-					"sinkFileName": "hospital_admissions.csv"
-				}
-			}
-		],
+		"pipelines": [],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
