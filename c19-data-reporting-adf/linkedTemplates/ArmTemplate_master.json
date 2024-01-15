@@ -23,14 +23,6 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().sourceBaseUrl}"
 		},
-		"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sourceRelativeUrl": {
-			"type": "string",
-			"defaultValue": "hospital_admissions.csv"
-		},
-		"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sinkFileName": {
-			"type": "string",
-			"defaultValue": "hospital_admissions.csv"
-		},
 		"tr_ingest_population_data_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/7c2b9f6f-40a7-4687-8982-9e0c10a926a9/resourceGroups/C19-rg/providers/Microsoft.Storage/storageAccounts/c19reportingsa"
@@ -73,12 +65,6 @@
 					},
 					"ls_https_opendata_ecdc_europa_eu_properties_typeProperties_url": {
 						"value": "[parameters('ls_https_opendata_ecdc_europa_eu_properties_typeProperties_url')]"
-					},
-					"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sourceRelativeUrl": {
-						"value": "[parameters('tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sourceRelativeUrl')]"
-					},
-					"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sinkFileName": {
-						"value": "[parameters('tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sinkFileName')]"
 					},
 					"tr_ingest_population_data_properties_typeProperties_scope": {
 						"value": "[parameters('tr_ingest_population_data_properties_typeProperties_scope')]"
