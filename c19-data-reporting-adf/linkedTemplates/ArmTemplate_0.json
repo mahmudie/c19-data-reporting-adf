@@ -21,11 +21,7 @@
 		},
 		"ls_https_opendata_ecdc_europa_eu_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://github.com/cloudboxacademy/covid19/raw/main/ecdc_data/"
-		},
-		"tr_ingest_population_data_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/7c2b9f6f-40a7-4687-8982-9e0c10a926a9/resourceGroups/C19-rg/providers/Microsoft.Storage/storageAccounts/c19reportingsa"
+			"defaultValue": "@{linkedService().sourceBaseUrl}"
 		},
 		"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sourceRelativeUrl": {
 			"type": "string",
@@ -34,6 +30,10 @@
 		"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sinkFileName": {
 			"type": "string",
 			"defaultValue": "hospital_admissions.csv"
+		},
+		"tr_ingest_population_data_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/7c2b9f6f-40a7-4687-8982-9e0c10a926a9/resourceGroups/C19-rg/providers/Microsoft.Storage/storageAccounts/c19reportingsa"
 		}
 	},
 	"variables": {
@@ -75,6 +75,11 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"sourceBaseUrl": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "HttpServer",
 				"typeProperties": {
@@ -84,6 +89,40 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ecdc_file_list')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_ablob_c19reportingsa",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "ecdc_file_list_for_2_files.json",
+						"container": "configs"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"sourceRelativeURL": {
+							"type": "string"
+						},
+						"sinkFileName": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_ablob_c19reportingsa')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_ecdc_raw_csv_dl')]",
@@ -129,10 +168,19 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "ls_https_opendata_ecdc_europa_eu",
-					"type": "LinkedServiceReference"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"sourceBaseUrl": {
+							"value": "@dataset().baseUrl",
+							"type": "Expression"
+						}
+					}
 				},
 				"parameters": {
 					"relativeurl": {
+						"type": "string"
+					},
+					"baseUrl": {
 						"type": "string"
 					}
 				},
@@ -492,6 +540,10 @@
 									"relativeurl": {
 										"value": "@pipeline().parameters.sourceRelativeUrl",
 										"type": "Expression"
+									},
+									"baseUrl": {
+										"value": "@pipeline().parameters.sourceBaseUrl",
+										"type": "Expression"
 									}
 								}
 							}
@@ -519,6 +571,9 @@
 					},
 					"sinkFileName": {
 						"type": "string"
+					},
+					"sourceBaseUrl": {
+						"type": "string"
 					}
 				},
 				"annotations": []
@@ -526,6 +581,39 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_http')]",
 				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tr_ingest_hospital_admission_data')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingests_ecdc_data",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"sourceRelativeUrl": "[parameters('tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sourceRelativeUrl')]",
+							"sinkFileName": "[parameters('tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sinkFileName')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2024-01-15T18:01:00",
+						"timeZone": "W. Europe Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingests_ecdc_data')]"
 			]
 		},
 		{
@@ -556,40 +644,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pl_ingest_population_dataa')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tr_ingest_hospital_admission_data')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "pl_ingests_ecdc_data",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"sourceRelativeUrl": "[parameters('tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sourceRelativeUrl')]",
-							"sinkFileName": "[parameters('tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sinkFileName')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2024-01-15T18:01:00",
-						"timeZone": "W. Europe Standard Time",
-						"schedule": {}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_ingests_ecdc_data')]"
 			]
 		}
 	]
