@@ -14,8 +14,17 @@
 		"ls_adls_c19reportingdl_properties_typeProperties_url": {
 			"value": "https://c19stroragedl2.dfs.core.windows.net/"
 		},
+		"ls_https_opendata_ecdc_europa_eu_properties_typeProperties_url": {
+			"value": "https://github.com/cloudboxacademy/covid19/raw/main/ecdc_data/"
+		},
 		"tr_ingest_population_data_properties_typeProperties_scope": {
 			"value": "/subscriptions/7c2b9f6f-40a7-4687-8982-9e0c10a926a9/resourceGroups/C19-rg/providers/Microsoft.Storage/storageAccounts/c19reportingsa"
+		},
+		"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sourceRelativeUrl": {
+			"value": "hospital_admissions.csv"
+		},
+		"tr_ingest_hospital_admission_data_properties_pl_ingests_ecdc_data_parameters_sinkFileName": {
+			"value": "hospital_admissions.csv"
 		}
 	}
 }
