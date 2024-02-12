@@ -62,7 +62,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> countryLookup",
-				"casesAnddeathsSource filter(continent=='Africa') ~> filterEuroOnlz",
+				"casesAnddeathsSource filter(continent=='Africa' && not(isNull(country))) ~> filterEuroOnlz",
 				"filterEuroOnlz select(mapColumn(",
 				"          country,",
 				"          country_code,",
