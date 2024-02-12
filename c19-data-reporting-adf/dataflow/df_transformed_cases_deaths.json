@@ -32,6 +32,9 @@
 				},
 				{
 					"name": "lookupCountry"
+				},
+				{
+					"name": "SelectforSink"
 				}
 			],
 			"scriptLines": [
@@ -59,7 +62,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> countryLookup",
-				"casesAnddeathsSource filter(continent=='Europe' && not(isNull(country_code))) ~> filterEuroOnlz",
+				"casesAnddeathsSource filter(continent=='Europe' ) ~> filterEuroOnlz",
 				"filterEuroOnlz select(mapColumn(",
 				"          country,",
 				"          country_code,",
@@ -84,7 +87,19 @@
 				"pivotCounts, countryLookup lookup(pivotCounts@country == countryLookup@country,",
 				"     multiple: false,",
 				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookupCountry"
+				"     broadcast: 'auto')~> lookupCountry",
+				"lookupCountry select(mapColumn(",
+				"          country = pivotCounts@country,",
+				"          country_code_2_digit,",
+				"          country_code_3_digit,",
+				"          population = pivotCounts@population,",
+				"          cases_count = {confirmed cases_count},",
+				"          deaths_count,",
+				"          reported_date,",
+				"          country = countryLookup@country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectforSink"
 			]
 		}
 	}
